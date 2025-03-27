@@ -14,7 +14,7 @@ const firstCandidate = async () => {
     console.error('No candidates found');
     return;
   }
-  const { login, avatar_url, email, location, company, bio } = await searchGithubUser(gitList[0].login);
+  const { login, avatar_url, email, location, company, bio, HTML_url } = await searchGithubUser(gitList[0].login);
   const newCandidate: Candidate = {
     login: login,
     avatarURL: avatar_url,
@@ -22,6 +22,7 @@ const firstCandidate = async () => {
     location: location,
     company: company,
     bio: bio,
+    HTML_url: HTML_url,
   };
   setCandidate(newCandidate);
 };
@@ -38,15 +39,20 @@ const handleMouseClickAccept = async () => {
     console.error('No candidates found');
     return;
   }
-  const { login, avatar_url, location, email, company, bio } = await searchGithubUser(gitList[0].login);
+  const { login, avatar_url, location, email, company, bio, HTML_url } = await searchGithubUser(gitList[0].login);
   const newCandidate: Candidate = {
     avatarURL: avatar_url,
     login: login,
     location: location,
     email: email,
     company: company,
-    bio: bio
+    bio: bio,
+    HTML_url: HTML_url,
   };
+  const storedCandidates = JSON.parse(localStorage.getItem('acceptedCandidates') || '[]');
+  storedCandidates.push(candidate);
+  localStorage.setItem('acceptedCandidates', JSON.stringify(storedCandidates));
+
   setCandidate(newCandidate);
   console.log(candidate);
 };
@@ -59,36 +65,40 @@ const handleMouseClickDeny = async () => {
     return;
   }
   console.log(gitList);
-  const { login, avatar_url, location, email, company, bio } = await searchGithubUser(gitList[0].login);
+  const { login, avatar_url, location, email, company, bio, HTML_url } = await searchGithubUser(gitList[0].login);
   const newCandidate: Candidate = {
     avatarURL: avatar_url,
     login: login,
     location: location,
     email: email,
     company: company,
-    bio: bio
+    bio: bio,
+    HTML_url: HTML_url,
   };
   setCandidate(newCandidate);
   console.log(candidate);
 };
 
 
-  return (
+return (
+  <div>
     <div>
-      <div>
-        <img src={candidate.avatarURL} alt="None" />
-        <div>{candidate.login}</div>
-        <div>{candidate.location}</div>
-        <div>{candidate.email}</div>
-        <div>{candidate.company}</div>
-        <div>{candidate.bio}</div>
-      </div>
-      <div>
-        <button onClick={handleMouseClickAccept}>Accept</button>
-        <button onClick={handleMouseClickDeny}>Deny</button>
-      </div>
+      <img
+        src={candidate.avatarURL || "https://via.placeholder.com/100"}
+        alt="No avatar"
+      />
+      <h2>Login: {candidate.login || "N/A"}</h2>
+      <p>Location: {candidate.location || "N/A"}</p>
+      <p>Email: {candidate.email || "N/A"}</p>
+      <p>Company: {candidate.company || "N/A"}</p>
+      <p>Bio: {candidate.bio || "N/A"}</p>
+      <p>HTML URL: {candidate.HTML_url || "N/A"}</p>
     </div>
-  );
+    <div>
+      <button onClick={handleMouseClickAccept}>Accept</button>
+      <button onClick={handleMouseClickDeny}>Deny</button>
+    </div>
+  </div>
+);
 }
-
 export default CandidateSearch;

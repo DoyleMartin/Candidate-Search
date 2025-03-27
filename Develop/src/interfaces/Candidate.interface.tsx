@@ -6,6 +6,7 @@
         email: string;
         company: string;
         bio: string;
+        HTML_url: string;
       }
       
       export default Candidate;
